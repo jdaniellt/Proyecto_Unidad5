@@ -1,0 +1,73 @@
+#!/bin/bash
+### Bash script to answer items A-J of the class exercise with wolves data
+
+## Script author:José Daniel Lara-Tufiño
+## Date of elaboration: 27/02/20
+
+## For this exercise it is necessary to have previously installed docker (https://docs.docker.com/) and vcftools (https://vcftools.github.io/index.html)
+
+##This exercise was performed in the CONABIO cluster, keep in mind that the absolute path must change according to each computer or cluster where the script is run.
+
+## Inside the "bin" directory created with Script 1, run VCFtools on a container with docker 
+
+##The flag -u 1600 only is used when we are using the CONABIO cluster
+
+docker run -u 1600 --rm -v /home/cirio/jdaniellt/BioinfinvRepro/Unidad5/ProjectUni5/data:/data biocontainers/vcftools:0.1.15 vcftools -help
+
+## A) How many individuals and variants (SNPs) does the file have?
+
+##Obtain the absolute path of the site where you are:
+
+pwd
+
+##Run VCFtools on a docker container 
+
+##Create a variable named "VCFtools" to summarize the previuos command (when you need run VCFtools). Note that this variable is ephemeral, and you must create a new one whenever you run the analysis
+ 
+vcftools="docker run -u 1600 --rm -v /home/cirio/jdaniellt/BioinfinvRepro/Unidad5/ProjectoUni5/data:/data biocontainers/vcftools:0.1.15 vcftools"
+
+## Run the variable and verify that it works well
+
+$vcftools -help
+
+##See the file "wolves.vcf" with the flag "--vcf"
+## A) How many individuals and variants (SNPs) does the file have?
+
+$vcftools --vcf wolves.vcf
+
+## B) Calculate the frequency of each allele for all individuals within the file wolves and save the result in a file
+
+$vcftools --vcf wolves.vcf --freq --out frequencies
+
+## C) How many sites do not have missing data in the file? 
+
+$vcftools --vcf wolves.vcf --max-missing 1
+
+## D) Calculate the frequency of each allele for all individuals but only for sites without missing data and save the result in a file
+
+$vcftools --vcf wolves.vcf --max-missing 1 --freq --out nomissingdata
+
+## E) How many sites have a lower allele frequency <0.05? 5224 sites
+
+$vcftools --vcf wolves.vcf --max-maf 0.05
+
+## F)  Calculate the heterozygosity of each individual
+
+$vcftools --vcf wolves.vcf --het --out heterozygosity
+
+## G)  Calculate nucleotide diversity per site
+
+$vcftools --vcf wolves.vcf --site-pi --out ndiversity
+
+## H)  Calculate nucleotide diversity per site only for chromosome 3 sites
+
+$vcftools --vcf wolves.vcf --chr chr03 --site-pi --out nucleodiversity_chr03
+
+## I)  Filter sites that have a minor allele frequency <0.05 and create a new file called wolves_maf05.vcf
+$vcftools --vcf wolves.vcf --max-maf 0.05 --recode --out wolves_maf05
+
+## J)  Convert the wolves_maf05.vcf file to plink format
+
+$vcftools --vcf wolves_maf05.recode.vcf --plink --out wolves_maf05.recode.vcf
+
+
